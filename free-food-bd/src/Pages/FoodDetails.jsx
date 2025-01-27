@@ -1,14 +1,25 @@
 import axios from 'axios';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { Clock, MapPin, User, X } from 'lucide-react';
 import useAuth from '../Provider/useAuth';
-
+import DatePicker from 'react-datepicker'
 const FoodDetails = () => {
   const { id } = useParams(); // Get the food ID from route parameters
   const { user } = useAuth();
+  const [requestDate, setRequestDate] = useState("");
+  const [startDate, setStartDate] = useState(new Date());
+  useEffect(() => {
+    // Get the current date and time
+    const now = new Date();
 
+    // Format the date and time as `YYYY-MM-DDTHH:mm`
+    const formattedDateTime = now.toISOString().slice(0, 16);
+
+    // Set the state with the formatted date-time
+    setRequestDate(formattedDateTime);
+  }, []);
   // Fetch the food details using React Query
   const { data: food, isLoading, isError, error } = useQuery({
     queryKey: ['foodDetails', id],
@@ -70,32 +81,32 @@ const FoodDetails = () => {
                   <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                 </form>
 
-                <h2 className="text-xl font-bold mb-4 text-center">Request Food</h2>
+                <h2 className="text-xl font-bold text-black mb-4 text-center">Request Food</h2>
                 <div className="grid grid-cols-2 gap-4">
                   {/* Image Placeholder */}
-                  <div className="col-span-2 flex items-center justify-center bg-gray-100 h-32 rounded-lg">
-                    <span className="text-gray-400">No Image Available</span>
+                  <div className='flex justify-center items-center max-w-max'>
+                    <img className=" bg-gray-100 shadow-lg p-6 w-full max-w-lg rounded-lg" src={food.foodImage} alt="" />
                   </div>
 
                   {/* Name */}
                   <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">Name</label>
+                    <label className="block text-sm font-medium text-black">Food Name</label>
                     <input
                       type="text"
-                      value="Margherita Pizza"
+                      value={food.foodName}
                       readOnly
-                      className="mt-1 block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
+                      className="mt-1 block w-full rounded-md bg-gray-50 text-black border-gray-300 shadow-sm focus:ring-black focus:border-black"
                     />
                   </div>
 
                   {/* Food ID */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Food ID</label>
+                    <label className="block text-sm font-medium text-black">Food ID</label>
                     <input
                       type="text"
                       value="1"
                       readOnly
-                      className="mt-1 block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
+                      className="mt-1 block w-full text-black rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
                     />
                   </div>
 
@@ -104,9 +115,9 @@ const FoodDetails = () => {
                     <label className="block text-sm font-medium text-gray-700">Donator Email</label>
                     <input
                       type="text"
-                      value="pizza.lover@example.com"
+                      value={food.donar.email}
                       readOnly
-                      className="mt-1 block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
+                      className="mt-1 block w-full rounded-md text-black bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
                     />
                   </div>
 
@@ -115,9 +126,9 @@ const FoodDetails = () => {
                     <label className="block text-sm font-medium text-gray-700">Donator Name</label>
                     <input
                       type="text"
-                      value="Pizza Lover"
+                      value={food.donar.name}
                       readOnly
-                      className="mt-1 block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
+                      className="mt-1 block w-full text-black rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
                     />
                   </div>
 
@@ -126,21 +137,31 @@ const FoodDetails = () => {
                     <label className="block text-sm font-medium text-gray-700">Your Email</label>
                     <input
                       type="text"
-                      value="logged.in.user@example.com"
+                      value={user?.email}
                       readOnly
-                      className="mt-1 block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
+                      className="mt-1 block w-full text-black rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
                     />
                   </div>
 
                   {/* Request Date */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700">Request Date</label>
-                    <input
-                      type="text"
-                      value="Jan 27, 2025, 11:50:19 PM"
-                      readOnly
-                      className="mt-1 block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
+
+                    <DatePicker
+                                          className="mt-1 block w-full text-black rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
+
+                      todayButton=""
+                      selected={startDate}
+                      onChange={(date) => setStartDate(date)}
                     />
+                    {/* <input
+                      type="datetime-local"
+                      id="requestDate"
+                      name="requestDate"
+                      value={requestDate}
+                      onChange={(e) => setRequestDate(e.target.value)} 
+                      className="mt-1 block w-full text-black rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
+                    /> */}
                   </div>
 
                   {/* Pickup Location */}
@@ -148,9 +169,9 @@ const FoodDetails = () => {
                     <label className="block text-sm font-medium text-gray-700">Pickup Location</label>
                     <input
                       type="text"
-                      value="123 Main St, Anytown, USA"
+                      value={food.pickupLocation}
                       readOnly
-                      className="mt-1 block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
+                      className="mt-1 text-black block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
                     />
                   </div>
 
@@ -159,9 +180,9 @@ const FoodDetails = () => {
                     <label className="block text-sm font-medium text-gray-700">Expiry Date</label>
                     <input
                       type="text"
-                      value="Jul 15, 2023, 6:00:00 PM"
+                      value={food.expiredDateTime}
                       readOnly
-                      className="mt-1 block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
+                      className="mt-1 text-black block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
                     />
                   </div>
 
@@ -171,13 +192,13 @@ const FoodDetails = () => {
                     <textarea
                       rows="3"
                       placeholder="Enter any additional information or requests here..."
-                      className="mt-1 block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
+                      className="mt-1 text-black block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
                     />
                   </div>
                 </div>
 
                 {/* Submit Button */}
-                <button className="mt-4 w-full bg-black text-black py-2 px-4 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                <button className="mt-4 w-full bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
                   Confirm Request
                 </button>
               </div>
