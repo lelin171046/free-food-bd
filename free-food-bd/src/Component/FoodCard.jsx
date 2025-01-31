@@ -28,7 +28,7 @@ const FoodCard = ({ food }) => {
             <div>
                 <img src={food?.foodImage} alt="Food" className="object-cover w-full mb-4 h-60 sm:h-96 dark:bg-gray-500" />
                 <h2 className="mb-1 text-xl font-semibold">{food?.foodName}</h2>
-                <p className="text-sm dark:text-gray-600">This meal can serve up to 5 people. Pickup from Main Street, City Center.</p>
+                
             </div>
             <div className="flex flex-col space-y-2">
                 <p className="text-sm"><strong>Food Name:</strong> {food?.foodName}</p>

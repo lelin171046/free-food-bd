@@ -1,26 +1,19 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
-import { Clock, MapPin, User, X } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Clock, MapPin, User } from 'lucide-react';
 import useAuth from '../Provider/useAuth';
-import DatePicker from 'react-datepicker'
+import DatePicker from 'react-datepicker';
+import toast from 'react-hot-toast';
+
 const FoodDetails = () => {
-  const { id } = useParams(); // Get the food ID from route parameters
+  const { id } = useParams();
   const { user } = useAuth();
-  const [requestDate, setRequestDate] = useState("");
   const [startDate, setStartDate] = useState(new Date());
-  useEffect(() => {
-    // Get the current date and time
-    const now = new Date();
+  const navigate = useNavigate()
 
-    // Format the date and time as `YYYY-MM-DDTHH:mm`
-    const formattedDateTime = now.toISOString().slice(0, 16);
-
-    // Set the state with the formatted date-time
-    setRequestDate(formattedDateTime);
-  }, []);
-  // Fetch the food details using React Query
+  // Fetch food details using React Query
   const { data: food, isLoading, isError, error } = useQuery({
     queryKey: ['foodDetails', id],
     queryFn: async () => {
@@ -30,183 +23,104 @@ const FoodDetails = () => {
     enabled: !!id,
   });
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  const handleRequest = async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const foodData = {
+      foodId: food?._id,
+      foodName: food?.foodName,
+      requestDate: startDate,
+      foodQuantity: food?.foodQuantity,
+      expiredDateTime: food?.expiredDateTime,
+      email: user?.email,
+      status: 'Pending',
+      comment: form.additionalNote.value,
+    };
+    console.log('Request Data:', foodData);
 
-  if (isError) {
-    return <div>Error: {error.message}</div>;
-  }
+    try {
+      const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/food-request`, foodData);
+      // console.log(data);
+      toast.success('Request placed successfully');
+      navigate('/my-food-request')
+    } catch (err) {
+      toast.error(err.response.data);
+      e.target.reset()
+    }
+  };
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="max-w-sm mx-auto m-10 p-5 bg-white rounded-lg shadow-md overflow-hidden relative">
+    <form onSubmit={handleRequest} className="max-w-sm mx-auto m-10 p-5 bg-white rounded-lg shadow-md">
       <div className="relative bg-gray-200 h-48 flex items-center justify-center">
-        {food.foodImage ? (
-          <img
-            src={food.foodImage}
-            alt={food.foodName}
-            className="w-full h-full object-cover"
-          />
+        {food?.foodImage ? (
+          <img src={food.foodImage} alt={food.foodName} className="w-full h-full object-cover" />
         ) : (
           <span className="text-gray-400 text-sm">No Image Available</span>
         )}
         <div className="absolute top-2 right-2 bg-white text-black text-xs font-semibold py-1 px-2 rounded-full">
-          {food.foodQuantity} {food.foodQuantity > 1 ? 'boxes' : 'box'}
+          {food?.foodQuantity} {food?.foodQuantity > 1 ? 'boxes' : 'box'}
         </div>
       </div>
       <div className="p-4">
-        <h3 className="text-lg font-bold text-gray-800">{food.foodName}</h3>
+        <h3 className="text-lg font-bold text-gray-800">{food?.foodName}</h3>
         <div className="text-sm text-gray-600 flex items-center mt-2">
-          <Clock className="w-4 h-4 mr-2" />
-          Expires: {food.expiredDateTime}
+          <Clock className="w-4 h-4 mr-2" /> Expires: {new Date(food.expiredDateTime).toLocaleDateString()}  
         </div>
         <div className="text-sm text-gray-600 flex items-center mt-2">
-          <MapPin className="w-4 h-4 mr-2" />
-          {food.pickupLocation} {/* Corrected reference to location */}
+          <MapPin className="w-4 h-4 mr-2" /> {food?.pickupLocation}
         </div>
         <div className="text-sm text-gray-600 flex items-center mt-2">
-          <User className="w-4 h-4 mr-2" />
-          Donated by: {food.donar?.name || 'Unknown'}
+          <User className="w-4 h-4 mr-2" /> Donated by: {food?.donar?.name || 'Unknown'}
         </div>
-
-        <div className="">
-          {/* You can open the modal using document.getElementById('ID').showModal() method */}
-          <button className="mt-4 w-full bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2" onClick={() => document.getElementById('my_modal_4').showModal()}>Request</button>
-          <dialog id="my_modal_4" className="modal">
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-              <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
-                {/* Close Icon */}
-                <form method="dialog">
-                  {/* if there is a button in form, it will close the modal */}
-                  <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                </form>
-
-                <h2 className="text-xl font-bold text-black mb-4 text-center">Request Food</h2>
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Image Placeholder */}
-                  <div className='flex justify-center items-center max-w-max'>
-                    <img className=" bg-gray-100 shadow-lg p-6 w-full max-w-lg rounded-lg" src={food.foodImage} alt="" />
-                  </div>
-
-                  {/* Name */}
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-black">Food Name</label>
-                    <input
-                      type="text"
-                      value={food.foodName}
-                      readOnly
-                      className="mt-1 block w-full rounded-md bg-gray-50 text-black border-gray-300 shadow-sm focus:ring-black focus:border-black"
-                    />
-                  </div>
-
-                  {/* Food ID */}
-                  <div>
-                    <label className="block text-sm font-medium text-black">Food ID</label>
-                    <input
-                      type="text"
-                      value="1"
-                      readOnly
-                      className="mt-1 block w-full text-black rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
-                    />
-                  </div>
-
-                  {/* Donator Email */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Donator Email</label>
-                    <input
-                      type="text"
-                      value={food.donar.email}
-                      readOnly
-                      className="mt-1 block w-full rounded-md text-black bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
-                    />
-                  </div>
-
-                  {/* Donator Name */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Donator Name</label>
-                    <input
-                      type="text"
-                      value={food.donar.name}
-                      readOnly
-                      className="mt-1 block w-full text-black rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
-                    />
-                  </div>
-
-                  {/* Your Email */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Your Email</label>
-                    <input
-                      type="text"
-                      value={user?.email}
-                      readOnly
-                      className="mt-1 block w-full text-black rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
-                    />
-                  </div>
-
-                  {/* Request Date */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Request Date</label>
-
-                    <DatePicker
-                                          className="mt-1 block w-full text-black rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
-
-                      todayButton=""
-                      selected={startDate}
-                      onChange={(date) => setStartDate(date)}
-                    />
-                    {/* <input
-                      type="datetime-local"
-                      id="requestDate"
-                      name="requestDate"
-                      value={requestDate}
-                      onChange={(e) => setRequestDate(e.target.value)} 
-                      className="mt-1 block w-full text-black rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
-                    /> */}
-                  </div>
-
-                  {/* Pickup Location */}
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">Pickup Location</label>
-                    <input
-                      type="text"
-                      value={food.pickupLocation}
-                      readOnly
-                      className="mt-1 text-black block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
-                    />
-                  </div>
-
-                  {/* Expiry Date */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Expiry Date</label>
-                    <input
-                      type="text"
-                      value={food.expiredDateTime}
-                      readOnly
-                      className="mt-1 text-black block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
-                    />
-                  </div>
-
-                  {/* Additional Notes */}
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-gray-700">Additional Notes</label>
-                    <textarea
-                      rows="3"
-                      placeholder="Enter any additional information or requests here..."
-                      className="mt-1 text-black block w-full rounded-md bg-gray-50 border-gray-300 shadow-sm focus:ring-black focus:border-black"
-                    />
-                  </div>
-                </div>
-
-                {/* Submit Button */}
-                <button className="mt-4 w-full bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                  Confirm Request
-                </button>
+        <button type="button" className="mt-4 w-full bg-black text-white py-2 px-4 rounded-lg" onClick={() => document.getElementById('request_modal').showModal()}>
+          Request
+        </button>
+        <dialog id="request_modal" className="modal">
+          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
+              <form method="dialog">
+                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+              </form>
+              <h2 className="text-xl font-bold text-black mb-4 text-center">Request Food</h2>
+              <div className="">
+                <h3 className="text-lg font-bold text-gray-800">{food?.foodName}</h3>
               </div>
-            </div>
-          </dialog>
+              <div className="grid grid-cols-2 gap-4">
+                <img className="col-span-2 bg-gray-100 shadow-lg p-6 w-full rounded-lg" src={food?.foodImage} alt="" />
+                <p className=" col-span-2text-sm dark:text-gray-600">This meal can serve up to {food.foodQuantity} people. Pickup from Main Street, City Center.</p>
+                
+                <div className="text-sm text-gray-600 flex items-center mt-2">
+                  <Clock className="w-4 h-4 mr-2" /> Expires: {new Date(food.expiredDateTime).toLocaleDateString()}  
+                </div>
+                <div className="">
+                <label className="  text-sm font-medium text-black">Request Date:</label>
+                <DatePicker
+                  className="mt-1 block w-full text-black rounded-md bg-gray-300 border-gray-300 shadow-sm"
+                  selected={startDate}
+                  onChange={(date) => setStartDate(date)}
+                />
+                </div>
+                <div className="text-sm text-gray-600 flex items-center mt-2">
+          <User className="w-4 h-4 mr-2" /> Donated by: {food?.donar?.name || 'Unknown'}
         </div>
+                <textarea
+                  rows="3"
+                  name="additionalNote"
+                  placeholder="Enter any additional information or requests here..."
+                  className="col-span-2 mt-1 text-black block w-full rounded-md bg-gray-300 border-gray-300 shadow-sm"
+                />
+              </div>
+              <button type="submit" className="mt-4 w-full bg-black text-white py-2 px-4 rounded-lg">
+                Confirm Request
+              </button>
+            </div>
+          </div>
+        </dialog>
       </div>
-    </div>
+    </form>
   );
 };
 

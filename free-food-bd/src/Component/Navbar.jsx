@@ -8,6 +8,9 @@ const Navbar = () => {
 	const { user, logOut } = useAuth()
 
 	const [isMenuOpen, setIsMenuOpen] = useState(false)
+	const togole = () =>{
+		setIsMenuOpen()
+	}
 
 
     return (
@@ -61,7 +64,7 @@ const Navbar = () => {
 					  <Link to={'/my-food'} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
 					  Manage My Foods
 					  </Link>
-					  <Link to={'/food-req'} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+					  <Link to={'/my-food-request'} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
 					  My Food Request
 					  </Link>
 					  

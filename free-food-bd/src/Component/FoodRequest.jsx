@@ -5,33 +5,35 @@ import toast from 'react-hot-toast';
 import useAuth from '../Provider/useAuth';
 import Loader from './Loader';
 import useAxiosSecure from '../Hook/useAxiosSecure';
+import Swal from 'sweetalert2';
 
 const FoodRequest = () => {
-    const { user } = useAuth()
+  const { user } = useAuth()
   const axiosSure = useAxiosSecure()
   const queryClient = useQueryClient()
   const {
-    data: bids = [],
+    data: foods = [],
     isError,
     isLoading,
     refetch,
     error } = useQuery({
-      queryFn: () => getData(),
-      queryKey: ['bids', user?.email],
+      queryFn: () => getData(user),
+      queryKey: ['foods', user?.email],
 
     })
 
 
 
 
-  const getData = async () => {
-    const { data } = await axiosSure(`/bids-requests/${user?.email}`)
+  const getData = async (user) => {
+    const { data } = await axiosSure(`/my-food-requests/${user?.email}`)
+    console.log(data, 'hiiiii');
     return data
   }
 
   const { mutateAsync, } = useMutation({
     mutationFn: async ({ id, status }) => {
-      const { data } = await axios.patch(`${import.meta.env.VITE_API_URL}/bid/${id}`, { status })
+      const { data } = await axios.patch(`${import.meta.env.VITE_API_URL}/food-request/${id}`, { status })
       console.log(data);
     },
     onSuccess: () => {
@@ -41,10 +43,32 @@ const FoodRequest = () => {
 
       // refetch()
       //OR
-      queryClient.invalidateQueries({queryKey: ['bids']})
+      queryClient.invalidateQueries({ queryKey: ['foods'] })
 
     }
   })
+
+  const handleDeleteMyFoodRequest = (id) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const { data } = await axiosSure.delete(`/food-request/delete/${id}`);
+        if (data.deletedCount > 0) {
+          toast.success("Deleted Success")
+          refetch()
+        }
+      }
+    });
+  };
+
+
   //handle Status
 
   const handleStatus = async (id, prevStatus, status) => {
@@ -65,7 +89,7 @@ const FoodRequest = () => {
         <h2 className='text-lg font-medium text-gray-800 '>Bid Requests</h2>
 
         <span className='px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-full '>
-          {bids.length} Requests
+          {foods.length} Requests
         </span>
       </div>
 
@@ -81,7 +105,7 @@ const FoodRequest = () => {
                       className='py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-white'
                     >
                       <div className='flex items-center gap-x-3'>
-                        <span>Title</span>
+                        <span>Food Title</span>
                       </div>
                     </th>
                     <th
@@ -97,7 +121,7 @@ const FoodRequest = () => {
                       scope='col'
                       className='px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-white'
                     >
-                      <span>Deadline</span>
+                      <span>Request Note</span>
                     </th>
 
                     <th
@@ -105,7 +129,7 @@ const FoodRequest = () => {
                       className='px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-white'
                     >
                       <button className='flex items-center gap-x-2'>
-                        <span>Price</span>
+                        <span>Quantity</span>
                       </button>
                     </th>
 
@@ -113,7 +137,7 @@ const FoodRequest = () => {
                       scope='col'
                       className='px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-white'
                     >
-                      Category
+                      Request Date
                     </th>
 
                     <th
@@ -129,55 +153,58 @@ const FoodRequest = () => {
                   </tr>
                 </thead>
                 <tbody className='bg-white divide-y divide-gray-200 '>
-                <tr>
+
+                  {
+                    foods.map(food => <tr key={food._id}>
+
+
                       <td className='px-4 py-4 text-sm text-gray-500  whitespace-nowrap'>
-                        {/* {bid.job_title} */}
+                        {food.foodName}
                       </td>
                       <td className='px-4 py-4 text-sm text-gray-500  whitespace-nowrap'>
-                        {/* {bid.email} */}
+                        {food.email}
                       </td>
 
                       <td className='px-4 py-4 text-sm text-gray-500  whitespace-nowrap'>
-                        {/* {new Date(bid.deadline).toLocaleDateString()} */}
+                        {food.comment}
                       </td>
 
                       <td className='px-4 py-4 text-sm text-gray-500  whitespace-nowrap'>
-                        {/* ${bid.price} */}
+                        {food.foodQuantity}
                       </td>
                       <td className='px-4 py-4 text-sm whitespace-nowrap'>
                         <div className='flex items-center gap-x-2'>
                           <p
                             className='px-3 py-1 rounded-full text-blue-500 bg-blue-100/60
-                               text-xs'
+                          text-xs'
                           >
-                            {/* {bid.category} */}
-                          </p>
+                            {new Date(food.requestDate).toLocaleDateString()}                     </p>
                         </div>
                       </td>
                       <td className='px-4 py-4 text-sm font-medium text-gray-700 whitespace-nowrap'>
                         <div className='inline-flex items-center px-3 py-1 rounded-full gap-x-2 bg-yellow-100/60 text-yellow-500'>
                           <span className='h-1.5 w-1.5 rounded-full bg-yellow-500'></span>
                           <h2 className='text-sm font-normal '>
-                            {/* {bid.status} */}
-                            </h2>
+                            {food.status}
+                          </h2>
                         </div>
                       </td>
                       <td className='px-4 py-4 text-sm whitespace-nowrap'>
                         <div className='flex items-center gap-x-6'>
                           <button
-                            // onClick={() => handleStatus(bid._id, bid.status, 'In Progress')}
-                            // disabled={bid.status === 'Complete'}
-                        //     className={`disabled:cursor-not-allowed text-gray-500 transition-colors duration-200
-                        //    ${bid.status !== 'Complete' && 'hover:text-red-500'} focus:outline-none`}
+                            onClick={() => handleStatus(food._id, food.status, 'In Progress')}
+                            disabled={food.status === 'Complete'}
+                            className={`disabled:cursor-not-allowed text-gray-500 transition-colors duration-200
+                             ${food.status !== 'Complete' && 'hover:text-red-500'} focus:outline-none`}
                           >✔</button>
 
                           {/* cancel button */}
                           <button
-                            // onClick={() => handleStatus(bid._id, bid.status, 'Cancelled')}
-                            // disabled={bid.status === 'Complete'}
-
+                            // onClick={() => handleStatus(food._id, food.status, 'Cancelled')}
+                            // disabled={food.status === 'Complete'}
+                            onClick={() => handleDeleteMyFoodRequest(food._id)}
                             className='text-gray-500 transition-colors duration-200   hover:text-yellow-500 focus:outline-none'>
-                            {/* ${bid.status !== 'Complete' && 'hover:text-red-500'}  */}
+                            {/* ${food.status !== 'Complete' && 'hover:text-red-500'}  */}
 
                             <svg
                               xmlns='http://www.w3.org/2000/svg'
@@ -196,7 +223,10 @@ const FoodRequest = () => {
                           </button>
                         </div>
                       </td>
-                    </tr>
+
+                    </tr>)
+                  }
+
                 </tbody>
               </table>
             </div>

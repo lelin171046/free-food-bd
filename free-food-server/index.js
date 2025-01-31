@@ -62,6 +62,7 @@ async function run() {
   try {
 
     const foodCollection = client.db('freeFoodBD').collection('foods');
+    const foodRequestCollection = client.db('freeFoodBD').collection('foods-request');
 
     //Generating jwt web tokens
     app.post('/jwt', async (req, res) => {
@@ -154,7 +155,7 @@ async function run() {
 
       res.send({ count });
     });
-    
+
     // Delete a food post
     app.delete('/foods/:id', async (req, res) => {
       const id = req.params.id;
@@ -177,13 +178,70 @@ async function run() {
       const result = await foodCollection.updateOne(query, updateDoc, options);
       res.send(result);
     });
-  // food by ID
-  app.get('/food/:id', async (req, res) => {
-    const id = req.params.id;
-    const query = { _id: new ObjectId(id) };
-    const result = await foodCollection.findOne(query);
-    res.send(result);
-  });
+    // food by ID
+    app.get('/food/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await foodCollection.findOne(query);
+      res.send(result);
+    });
+
+
+
+    app.post('/food-request', async (req, res) => {
+      try {
+        const foodData = req.body;
+        const options = { upsert: true };
+
+        const query = {
+          email: foodData.email,
+          foodId: foodData.foodId
+        };
+
+        const alreadyApplied = await foodRequestCollection.findOne(query);
+
+        if (alreadyApplied) {
+          return res.status(400).send('You already placed a request on this post');
+        }
+
+        const result = await foodRequestCollection.insertOne(foodData);
+
+        if (result.acknowledged) {
+          const queryId = { _id: new ObjectId(foodData?.foodId) }
+          console.log("acknowledged ===>", queryId);
+          await foodCollection.updateOne(
+            queryId, // Ensure foodId is valid
+            { $set: { booked: true } }, options
+          );
+        }
+
+        res.send(result);
+      } catch (error) {
+        console.error('Error processing food request:', error);
+        res.status(500).send('Internal Server Error');
+      }
+    });
+
+
+
+    //my food request
+    app.get('/my-food-requests/:email', async (req, res) => {
+      const email = req.params.email
+      const query = { email };
+      const result = await foodRequestCollection.find(query).toArray();
+      res.send(result);
+
+    })
+
+    // delete food request
+    app.delete('/food-request/delete/:id', async (req, res) => {
+      const id = req.params.id;
+
+      const query = { _id: new ObjectId(id) };
+      const result = await foodRequestCollection.deleteOne(query);
+      res.send(result);
+    });
+
 
     // Send a ping to confirm successful connection
     // await client.db('admin').command({ ping: 1 });
@@ -192,6 +250,8 @@ async function run() {
     console.error('MongoDB connection error:', err);
   }
 }
+
+
 
 // Start the run function
 run();
