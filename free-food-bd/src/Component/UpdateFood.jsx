@@ -76,12 +76,12 @@ const UpdateFood = () => {
       return (
         <section className="p-6 min-h-screen bg-gradient-to-br from-purple-100 to-indigo-200 text-gray-800 flex items-center justify-center">
         <form onSubmit={handleSubmit} className="container max-w-4xl mx-auto space-y-8 bg-white  rounded-2xl shadow-2xl p-8 transform transition-all duration-500 hover:scale-[1.01]">
-          <h2 className="text-3xl font-bold text-center mb-8 text-indigo-700">Food Donation Form</h2>
+          <h2 className="text-3xl font-bold text-center mb-8 text-black">Update Food Donation Form</h2>
           
           {/* Food Donation Information */}
           <fieldset className="grid grid-cols-1 md:grid-cols-4 gap-6 p-6 rounded-xl shadow-md bg-gradient-to-r from-indigo-50 to-purple-50">
             <div className="space-y-2 col-span-full md:col-span-1">
-              <p className="font-semibold text-lg text-indigo-700">Food Donation Information</p>
+              <p className="font-semibold text-lg text-black">Food Donation Information</p>
               <p className="text-sm text-gray-600">Please provide details about the food you wish to donate.</p>
             </div>
             <div className="grid grid-cols-6 gap-4 col-span-full md:col-span-3">
@@ -152,7 +152,7 @@ const UpdateFood = () => {
           
           {/* Submit button */}
           <div className="flex justify-end space-x-2">
-            <button type="submit" className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-md hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transform transition-all duration-150 hover:scale-105 active:scale-95 shadow-lg">
+            <button type="submit" className="px-8 py-3 bg-gradient-to-r from-black to-green-400 text-white rounded-md hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transform transition-all duration-150 hover:scale-105 active:scale-95 shadow-lg">
              Update Donation
             </button>
           </div>

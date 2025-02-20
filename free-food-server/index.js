@@ -115,7 +115,7 @@ async function run() {
         if(latest){
           try {
             // Fetch the latest 6 items sorted by creation date (assuming you have a timestamp field like createdAt)
-            const result = await foodCollection.find()
+            const result = await foodCollection.find({ booked: { $ne: true } })
             .sort({ _id: -1 })
               .limit(6) // Get only the latest 6
               .toArray();

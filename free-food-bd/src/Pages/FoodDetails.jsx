@@ -2,7 +2,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Clock, User } from 'lucide-react';
+import { Clock, Loader2, Locate, LocateFixedIcon, LocateIcon, LocateOff, LocateOffIcon, User } from 'lucide-react';
 import useAuth from '../Provider/useAuth';
 import DatePicker from 'react-datepicker';
 import toast from 'react-hot-toast';
@@ -58,6 +58,7 @@ const FoodDetails = () => {
       <div className="card-body">
         <h2 className="card-title">{food?.foodName}</h2>
         <p><strong>Donated by:</strong> {food?.donar?.name || 'Unknown'}</p>
+        <p>Donator email:{food?.donar?.email}</p>
         <p><strong>Quantity:</strong> Serves {food?.foodQuantity} people</p>
         <p><strong>Expires:</strong> {new Date(food?.expiredDateTime).toLocaleDateString()}</p>
 
@@ -83,7 +84,7 @@ const FoodDetails = () => {
               <div className="grid grid-cols-2 gap-4 mt-2 p-4 bg-white rounded-lg shadow-md">
                 <div className="flex items-center text-sm text-gray-700">
                   <Clock className="w-4 h-4 mr-2 text-red-500" />
-                  <span className="font-medium">Expires:</span> {new Date(food?.expiredDateTime).toLocaleDateString()}
+                  <span className="font-medium text-red-500">Expires:</span> {new Date(food?.expiredDateTime).toLocaleDateString()}
                 </div>
                 <div className="flex items-center text-sm text-gray-700">
                   <User className="w-4 h-4 mr-2 text-blue-500" />
@@ -94,8 +95,12 @@ const FoodDetails = () => {
                   <DatePicker
                     selected={startDate}
                     onChange={(date) => setStartDate(date)}
-                    className="relative z-50"
+                    className="relative text-black bg-white z-50"
                   />
+                </div>
+                <div className="flex items-center flex-wrap text-sm w-full text-gray-700">
+               <Locate></Locate>
+               <span className=" block text-sm font-semibold text-gray-900">Pickup Location: </span> {food?.pickupLocation || 'Unknown'}
                 </div>
                 <div className="col-span-2">
                   <label className="block text-sm font-semibold text-gray-900">Additional Information:</label>
@@ -106,6 +111,8 @@ const FoodDetails = () => {
                     className="mt-1 block w-full text-black rounded-md bg-gray-200 border border-gray-300 shadow-sm focus:ring focus:ring-blue-300"
                   />
                 </div>
+                <label className="block text-sm font-semibold text-gray-900">User email:</label>
+                <p>{user?.email}</p>
               </div>
 
               {/* Ensure button does not trigger form submission */}
