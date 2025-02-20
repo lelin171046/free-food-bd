@@ -1,8 +1,8 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Clock, MapPin, User } from 'lucide-react';
+import { Clock, User } from 'lucide-react';
 import useAuth from '../Provider/useAuth';
 import DatePicker from 'react-datepicker';
 import toast from 'react-hot-toast';
@@ -11,9 +11,8 @@ const FoodDetails = () => {
   const { id } = useParams();
   const { user } = useAuth();
   const [startDate, setStartDate] = useState(new Date());
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-  // Fetch food details using React Query
   const { data: food, isLoading, isError, error } = useQuery({
     queryKey: ['foodDetails', id],
     queryFn: async () => {
@@ -26,6 +25,7 @@ const FoodDetails = () => {
   const handleRequest = async (e) => {
     e.preventDefault();
     const form = e.target;
+
     const foodData = {
       foodId: food?._id,
       foodName: food?.foodName,
@@ -36,16 +36,14 @@ const FoodDetails = () => {
       status: 'Pending',
       comment: form.additionalNote.value,
     };
-    console.log('Request Data:', foodData);
 
     try {
-      const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/food-request`, foodData);
-      // console.log(data);
+      await axios.post(`${import.meta.env.VITE_API_URL}/food-request`, foodData);
       toast.success('Request placed successfully');
-      navigate('/my-food-request')
+      navigate('/my-food-request');
     } catch (err) {
-      toast.error(err.response.data);
-      e.target.reset()
+      toast.error(err.response?.data || 'Request failed');
+      e.target.reset();
     }
   };
 
@@ -53,74 +51,72 @@ const FoodDetails = () => {
   if (isError) return <div>Error: {error.message}</div>;
 
   return (
-    <form onSubmit={handleRequest} className="max-w-sm mx-auto m-10 p-5 bg-white rounded-lg shadow-md">
-      <div className="relative bg-gray-200 h-48 flex items-center justify-center">
-        {food?.foodImage ? (
-          <img src={food.foodImage} alt={food.foodName} className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-gray-400 text-sm">No Image Available</span>
-        )}
-        <div className="absolute top-2 right-2 bg-white text-black text-xs font-semibold py-1 px-2 rounded-full">
-          {food?.foodQuantity} {food?.foodQuantity > 1 ? 'boxes' : 'box'}
-        </div>
-      </div>
-      <div className="p-4">
-        <h3 className="text-lg font-bold text-gray-800">{food?.foodName}</h3>
-        <div className="text-sm text-gray-600 flex items-center mt-2">
-          <Clock className="w-4 h-4 mr-2" /> Expires: {new Date(food.expiredDateTime).toLocaleDateString()}  
-        </div>
-        <div className="text-sm text-gray-600 flex items-center mt-2">
-          <MapPin className="w-4 h-4 mr-2" /> {food?.pickupLocation}
-        </div>
-        <div className="text-sm text-gray-600 flex items-center mt-2">
-          <User className="w-4 h-4 mr-2" /> Donated by: {food?.donar?.name || 'Unknown'}
-        </div>
-        <button type="button" className="mt-4 w-full bg-black text-white py-2 px-4 rounded-lg" onClick={() => document.getElementById('request_modal').showModal()}>
+    <div className="card items-center justify-center lg:card-side bg-gray-300 max-w-fit m-5 text-black h-max shadow-xl p-5">
+      <figure>
+        <img src={food?.foodImage} alt={food?.foodName} className="w-full h-60 object-cover" />
+      </figure>
+      <div className="card-body">
+        <h2 className="card-title">{food?.foodName}</h2>
+        <p><strong>Donated by:</strong> {food?.donar?.name || 'Unknown'}</p>
+        <p><strong>Quantity:</strong> Serves {food?.foodQuantity} people</p>
+        <p><strong>Expires:</strong> {new Date(food?.expiredDateTime).toLocaleDateString()}</p>
+
+        {/* Button to open modal */}
+        <button className="btn btn-primary" onClick={() => document.getElementById('my_modal_3').showModal()}>
           Request
         </button>
-        <dialog id="request_modal" className="modal">
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-            <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
-              <form method="dialog">
-                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-              </form>
-              <h2 className="text-xl font-bold text-black mb-4 text-center">Request Food</h2>
-              <div className="">
-                <h3 className="text-lg font-bold text-gray-800">{food?.foodName}</h3>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <img className="col-span-2 bg-gray-100 shadow-lg p-6 w-full rounded-lg" src={food?.foodImage} alt="" />
-                <p className=" col-span-2text-sm dark:text-gray-600">This meal can serve up to {food.foodQuantity} people. Pickup from Main Street, City Center.</p>
-                
-                <div className="text-sm text-gray-600 flex items-center mt-2">
-                  <Clock className="w-4 h-4 mr-2" /> Expires: {new Date(food.expiredDateTime).toLocaleDateString()}  
+
+        {/* Modal (moved outside form) */}
+        <dialog id="my_modal_3" className="modal">
+          <div className="modal-box bg-slate-200">
+            {/* Close Button */}
+            <form method="dialog">
+              <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+
+            <h2 className="text-xl font-bold text-black mb-4 text-center">Request Food</h2>
+            <img className="bg-gray-100 shadow-lg p-6 w-full rounded-lg" src={food?.foodImage || 'no img'} alt="" />
+            <p className="text-sm">This meal can serve up to {food?.foodQuantity} people.</p>
+
+            {/* Form inside modal */}
+            <form onSubmit={handleRequest}>
+              <div className="grid grid-cols-2 gap-4 mt-2 p-4 bg-white rounded-lg shadow-md">
+                <div className="flex items-center text-sm text-gray-700">
+                  <Clock className="w-4 h-4 mr-2 text-red-500" />
+                  <span className="font-medium">Expires:</span> {new Date(food?.expiredDateTime).toLocaleDateString()}
                 </div>
-                <div className="">
-                <label className="  text-sm font-medium text-black">Request Date:</label>
-                <DatePicker
-                  className="mt-1 block w-full text-black rounded-md bg-gray-300 border-gray-300 shadow-sm"
-                  selected={startDate}
-                  onChange={(date) => setStartDate(date)}
-                />
+                <div className="flex items-center text-sm text-gray-700">
+                  <User className="w-4 h-4 mr-2 text-blue-500" />
+                  <span className="font-medium">Donated by:</span> {food?.donar?.name || 'Unknown'}
                 </div>
-                <div className="text-sm text-gray-600 flex items-center mt-2">
-          <User className="w-4 h-4 mr-2" /> Donated by: {food?.donar?.name || 'Unknown'}
-        </div>
-                <textarea
-                  rows="3"
-                  name="additionalNote"
-                  placeholder="Enter any additional information or requests here..."
-                  className="col-span-2 mt-1 text-black block w-full rounded-md bg-gray-300 border-gray-300 shadow-sm"
-                />
+                <div className="col-span-2">
+                  <label className="block text-sm font-semibold text-gray-900">Request Date:</label>
+                  <DatePicker
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                    className="relative z-50"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-semibold text-gray-900">Additional Information:</label>
+                  <textarea
+                    rows="3"
+                    name="additionalNote"
+                    placeholder="Enter any additional information or requests here..."
+                    className="mt-1 block w-full text-black rounded-md bg-gray-200 border border-gray-300 shadow-sm focus:ring focus:ring-blue-300"
+                  />
+                </div>
               </div>
+
+              {/* Ensure button does not trigger form submission */}
               <button type="submit" className="mt-4 w-full bg-black text-white py-2 px-4 rounded-lg">
                 Confirm Request
               </button>
-            </div>
+            </form>
           </div>
         </dialog>
       </div>
-    </form>
+    </div>
   );
 };
 

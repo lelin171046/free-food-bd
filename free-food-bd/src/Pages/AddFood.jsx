@@ -36,6 +36,7 @@ const AddFood = () => {
         pickupLocation,
         expiredDateTime,
         additionalNotes,
+        booked: false,
 
         donar: {
             email,

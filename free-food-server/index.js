@@ -110,13 +110,35 @@ async function run() {
 
     app.get('/all-foods', async (req, res) => {
       try {
+        const latest = req.query;
+        
+        if(latest){
+          try {
+            // Fetch the latest 6 items sorted by creation date (assuming you have a timestamp field like createdAt)
+            const result = await foodCollection.find()
+            .sort({ _id: -1 })
+              .limit(6) // Get only the latest 6
+              .toArray();
+        
+           console.log(result,'fgdhg');   
+            res.status(200).send(result);
+          } catch (err) {
+            console.error("Error fetching latest foods:", err);
+            res.status(500).send({ error: 'An error occurred while fetching latest foods.' });
+          }
+        }
+
+       else{
         const size = parseInt(req.query.size) || 10; // Default size if not provided
         const page = parseInt(req.query.page) - 1 || 0; // Default page to 0 if not provided
         // const filter = req.query.filter;
         const sort = req.query.sort;
         const search = req.query.search;
 
-        let query = { foodName: { $regex: search, $options: 'i' } };
+        let query = {
+          foodName: { $regex: search, $options: 'i' },
+          booked: { $ne: true }  // Exclude booked items
+        };
         // if (filter) query.category = filter;
 
         let option = {};
@@ -125,17 +147,28 @@ async function run() {
             expiredDateTime: sort === "asc" ? 1 : -1
           }
         };
+        console.log('home',req.query);
 
         // Make sure jobCollection is available and connected
         const result = await foodCollection.find(query, option).skip(page * size).limit(size).toArray();
+        // const filteredData = data.filter(item => item.booked !== true)
 
+        console.log('here', result);
         res.status(200).send(result);
+       }
+
+
+       
       } catch (err) {
         console.error("Error fetching jobs:", err);
         res.status(500).send({ error: 'An error occurred while fetching jobs.' });
       }
     });
+//home page foods
+app.get('/latest-food', async (req,res)=>{
 
+
+})
 
     //Count all job
     app.get('/foods-count', async (req, res) => {
@@ -144,7 +177,8 @@ async function run() {
       const search = req.query.search;
 
       let query = {
-        foodName: { $regex: search, $options: 'i' }
+        foodName: { $regex: search, $options: 'i' },
+        booked: { $ne: true }
       }
 
       // if (filter) query.category = filter
