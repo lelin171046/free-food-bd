@@ -12,7 +12,7 @@ const Home = () => {
         const getData = async () => {
             const { data } = await axios(
                 `${import.meta.env.VITE_API_URL
-                }/all-foods?latest=true`
+                }/latest-food`
             )
 
             // filter according to bokked

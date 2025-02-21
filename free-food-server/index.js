@@ -147,26 +147,9 @@ app.post("/upload-image", async (req, res) => {
     // All available foods
 
     app.get('/all-foods', async (req, res) => {
-      try {
-        const latest = req.query;
-        
-        if(latest){
-          try {
-            // Fetch the latest 6 items sorted by creation date (assuming you have a timestamp field like createdAt)
-            const result = await foodCollection.find({ booked: { $ne: true } })
-            .sort({ _id: -1 })
-              .limit(6) // Get only the latest 6
-              .toArray();
-        
-           console.log(result,'fgdhg');   
-            res.status(200).send(result);
-          } catch (err) {
-            console.error("Error fetching latest foods:", err);
-            res.status(500).send({ error: 'An error occurred while fetching latest foods.' });
-          }
-        }
+     
 
-       else{
+      
         const size = parseInt(req.query.size) || 10; // Default size if not provided
         const page = parseInt(req.query.page) - 1 || 0; // Default page to 0 if not provided
         // const filter = req.query.filter;
@@ -193,20 +176,30 @@ app.post("/upload-image", async (req, res) => {
 
         console.log('here', result);
         res.status(200).send(result);
-       }
+       
 
 
        
-      } catch (err) {
-        console.error("Error fetching jobs:", err);
-        res.status(500).send({ error: 'An error occurred while fetching jobs.' });
-      }
-    });
+      } 
+    );
 //home page foods
-app.get('/latest-food', async (req,res)=>{
+app.get('/latest-food', async (req, res) => {
+  try {
+    // Fetch the latest 6 items sorted by _id (assuming _id is sequential)
+    const result = await foodCollection
+      .find({ booked: { $ne: true } }) // Only unbooked items
+      .sort({ _id: -1 }) // Sort by newest first
+      .limit(6) // Limit to 6 items
+      .toArray();
 
+    console.log(result, 'Latest foods fetched');
+    res.status(200).send(result);
+  } catch (err) {
+    console.error("Error fetching latest foods:", err);
+    res.status(500).send({ error: 'An error occurred while fetching latest foods.' });
+  }
+});
 
-})
 
     //Count all job
     app.get('/foods-count', async (req, res) => {

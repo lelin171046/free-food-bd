@@ -11,40 +11,39 @@ const AddFood = () => {
   const [uploading, setUploading] = useState(false);
   const [foodStatus] = useState("available");
 
-  const handleImageChange = (e) => {
-    if (e.target.files?.[0]) {
-      setImage(e.target.files[0]);
-    }
-  };
-
-  const uploadImage = async () => {
-    if (!image) return null;
-    setUploading(true);
+  const handleImageChange = async (e) => {
+    const img = e.target.files?.[0];
+    if (!img) return;
     
+    setUploading(true); // Indicate uploading starts
+  
     const formData = new FormData();
-    formData.append("file", image);
+    formData.append("file", img);
+    formData.append("upload_preset", 'Free_Food_BD');
+    formData.append("cloud_name", "dg04kyz8n");
   
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/upload-image`, formData, {
+      const response = await axios.post(`https://api.cloudinary.com/v1_1/dg04kyz8n/image/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
-
-        
       });
-  console.log(response.data, 'jjjjjjj');
+  
       if (response.status === 200) {
-        return response.data.secure_url; // Adjust based on your API response
-        
+        setImage(response.data.url); // Store image URL in state
+        console.log(response.data, 'Upload response');
       } else {
         throw new Error("Upload failed");
       }
     } catch (error) {
       console.error("Image upload error:", error);
       toast.error("Failed to upload image");
-      return null;
     } finally {
-      setUploading(false);
+      setUploading(false); // Indicate uploading ends
     }
   };
+  
+
+ 
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,14 +55,8 @@ const AddFood = () => {
     const additionalNotes = form.additionalNotes.value;
     const email = form.donatorEmail.value;
 
-    let foodImage = null;
-    try {
-      foodImage = await uploadImage();
-    } catch (error) {
-      console.error("Image upload error:", error);
-      toast.error("Failed to upload image");
-      return;
-    }
+    const foodImage = image;
+    
 
     const foodData = {
       foodName,
@@ -97,37 +90,37 @@ const AddFood = () => {
         
         <div className="mt-6">
           <label className="block text-sm font-medium">Food Name</label>
-          <input name="foodName" type="text" required className="w-full p-2 border rounded-md" />
+          <input name="foodName" type="text" required className="w-full bg-slate-300 text-black p-2 border rounded-md" />
         </div>
 
         <div className="mt-4">
           <label className="block text-sm font-medium">Upload Food Image</label>
-          <input type="file" accept="image/*" onChange={handleImageChange} className="w-full p-2 border rounded-md" />
+          <input type="file" accept="image/*" onChange={handleImageChange} className="w-full  bg-slate-300 text-black p-2 border rounded-md" />
         </div>
 
         <div className="mt-4">
           <label className="block text-sm font-medium">Food Quantity</label>
-          <input name="foodQuantity" type="number" min="1" required className="w-full p-2 border rounded-md" />
+          <input name="foodQuantity" type="number" min="1" required className="w-full  bg-slate-300 text-black p-2 border rounded-md" />
         </div>
 
         <div className="mt-4">
           <label className="block text-sm font-medium">Pickup Location</label>
-          <input name="pickupLocation" type="text" required className="w-full p-2 border rounded-md" />
+          <input name="pickupLocation" type="text" required className="w-full  bg-slate-300 text-black p-2 border rounded-md" />
         </div>
 
         <div className="mt-4">
           <label className="block text-sm font-medium">Expiration Date/Time</label>
-          <input name="expiredDateTime" type="datetime-local" required className="w-full p-2 border rounded-md" />
+          <input name="expiredDateTime" type="datetime-local" required className="w-full  bg-slate-300 text-black p-2 border rounded-md" />
         </div>
 
         <div className="mt-4">
           <label className="block text-sm font-medium">Additional Notes</label>
-          <textarea name="additionalNotes" className="w-full p-2 border rounded-md"></textarea>
+          <textarea name="additionalNotes" className="w-full  bg-slate-300 text-black p-2 border rounded-md"></textarea>
         </div>
 
         <div className="mt-4">
           <label className="block text-sm font-medium">Donator Email</label>
-          <input name="donatorEmail" type="email" value={user?.email} readOnly className="w-full p-2 border bg-gray-100 rounded-md" />
+          <input name="donatorEmail" type="email" value={user?.email} readOnly className="w-full   text-black p-2 border bg-gray-100 rounded-md" />
         </div>
 
         <button type="submit" className="mt-6 w-full bg-indigo-600 text-white py-2 rounded-md">

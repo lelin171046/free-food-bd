@@ -46,7 +46,7 @@ const FoodCard = ({ food }) => {
         <figure className='w-full h-full object-cover'>
           <img
             src={food?.foodImage}
-            alt="Shoes" />
+            alt="Food" />
         </figure>
         <div className="text-black card-body">
         <h3 className="text-lg font-bold text-gray-800">{food?.foodName}</h3>

@@ -21,10 +21,7 @@ const AvailableFood = () => {
         }/all-foods?page=${currentPage}&size=${itemsPerPage}&sort=${sort}&search=${search}`
       )
 
-      // filter according to bokked
-      // const filteredData = data.filter(item => item.booked !== true)
-      // console.log(filteredData);
-
+      
       setFoods(data)
     }
     getData()
@@ -69,25 +66,7 @@ const AvailableFood = () => {
     <div>
       <div>
         <div className='flex flex-col md:flex-row justify-center items-center gap-5 '>
-          {/* <div>
-            <select
-              onChange={e => {dff
-                setFilter(e.target.value)
-                setCurrentPage(1) gfl;rg
-              }}
-              value={filter}
-              name='category'
-              id='category'
-              className='border p-4 rounded-lg'
-            >
-              <option value=''>Filter By Category</option>
-              <option value='Web Development'>Web Development</option>
-              <option value='Graphics Design'>Graphics Design</option>
-              <option value='Digital Marketing'>Digital Marketing</option>
-              <option value='Video Editing'>Video Editing</option>
-              <option value='Data Entry'>Data Entry</option>
-            </select>
-          </div> */}
+          
 
           <form onSubmit={handleSearch}>
             <div className='flex p-1 overflow-hidden border rounded-lg    focus-within:ring focus-within:ring-opacity-40 focus-within:border-blue-400 focus-within:ring-blue-300'>
