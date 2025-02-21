@@ -70,21 +70,21 @@ const Navbar = () => {
           {/* Profile Dropdown (Hover & Clickable) */}
           {user && (
 			 <div className="dropdown dropdown-end z-50 bg-white">
-			 <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-			   <div className="w-10 rounded-full">
+			 <div tabIndex={0} role="button" className="btn btn-ghost border-orange-500 btn-circle avatar">
+			   <div className="w-10 rounded-full ">
 				 <img
-				   alt="Tailwind CSS Navbar component"
-				   src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+				   className="border-orange-500"
+				   src={user?.photoURL || 'https://lh3.googleusercontent.com/a/ACg8ocLyA_AGjJhTAGDwGgVn2h6jmZfBlQrIIbBwPOckbjd7tLS1BYEa=s96-c'} />
 			   </div>
 			 </div>
 			 <ul
 			   tabIndex={0}
 			   className="menu menu-sm dropdown-content bg-white rounded-box z-[1] mt-3 w-52 p-2 shadow">
 			   <li>
-				 <a className="justify-between">
+				 <Link to={'/profile'} className="justify-between">
 				   Profile
 				   <span className="badge">New</span>
-				 </a>
+				 </Link>
 			   </li>
 			   <Link
                    to="/add-food"

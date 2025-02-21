@@ -13,6 +13,7 @@ import App from "../App";
 import UpdateFood from "../Component/UpdateFood";
 import FoodDetails from "../Pages/FoodDetails";
 import Contact from "../Pages/Contact";
+import Profile from "../Pages/Profile";
 
 const router = createBrowserRouter([
     {
@@ -55,6 +56,11 @@ const router = createBrowserRouter([
                 
 
             },
+            {
+                path: '/profile',
+                element: <Profile></Profile>
+            }
+            ,
             {
                 path: '/registration',
                 element: <Registration></Registration>

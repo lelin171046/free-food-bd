@@ -5,6 +5,13 @@ import cors from 'cors';
 
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import { v2 as cloudinary } from "cloudinary";
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 dotenv.config();
 
@@ -47,7 +54,8 @@ const verifyToken = (req, res, next) => {
 
 }
 
-const uri = `mongodb://localhost:27017/`;
+// const uri = `mongodb://localhost:27017/`;
+const uri = `mongodb+srv://free_food_bd:UmSDOWO0sx31EFFi@cluster0.0f5vnoo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient
 const client = new MongoClient(uri, {
@@ -104,6 +112,36 @@ async function run() {
       res.send(result);
     });
 
+////image Uploadinggggggggggggg
+
+app.post("/upload-image", async (req, res) => {
+  try {
+    const { image } = req.body;
+
+    if (!image) {
+      return res.status(400).json({ error: "No image provided" });
+    }
+
+    const uploadResponse = await cloudinary.uploader.upload(image, {
+      upload_preset: "ml_default",
+    });
+
+    // Store image data in MongoDB
+    const db = client.db("freeFoodBD");
+    const imageDoc = {
+      publicId: uploadResponse.public_id,
+      url: uploadResponse.secure_url,
+      createdAt: new Date(),
+    };
+
+    await db.collection("images").insertOne(imageDoc);
+
+    res.json({ message: "Image uploaded successfully", image: imageDoc });
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    res.status(500).json({ error: "Error uploading image" });
+  }
+});
 
 
     // All available foods
