@@ -37,6 +37,8 @@ const FoodDetails = () => {
       comment: form.additionalNote.value,
     };
 
+    if(user?.email === food?.donar?.email) return toast.error('You can request your own post')
+      
     try {
       await axios.post(`${import.meta.env.VITE_API_URL}/food-request`, foodData);
       toast.success('Request placed successfully');
@@ -46,6 +48,7 @@ const FoodDetails = () => {
       e.target.reset();
     }
   };
+
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error: {error.message}</div>;

@@ -38,7 +38,7 @@ const Home = () => {
                 </div>
                 <div className="flex justify-center w-full mt-6">
                     <Link to={'/available-food'}>
-                        <button type="button" className="px-8 py-3 font-semibold rounded-full dark:bg-gray-600 dark:text-white">
+                        <button type="button" className="px-8 py-3 font-semibold rounded-full dark:bg-white dark:text-gray-600">
                             See More
                         </button>
                     </Link>
