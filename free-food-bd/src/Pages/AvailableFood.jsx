@@ -65,11 +65,11 @@ const AvailableFood = () => {
   return (
     <div>
       <div>
-        <div className='flex flex-col md:flex-row justify-center items-center gap-5 '>
+        <div className='flex flex-col md:flex-row justify-center items-center  '>
           
 
           <form onSubmit={handleSearch}>
-            <div className='flex p-1 overflow-hidden border rounded-lg    focus-within:ring focus-within:ring-opacity-40 focus-within:border-blue-400 focus-within:ring-blue-300'>
+            <div className='flex p-5 overflow-hidden border rounded-lg    focus-within:ring focus-within:ring-opacity-40 focus-within:border-blue-400 focus-within:ring-blue-300'>
               <input
                 className='px-6 py-2 text-gray-700 placeholder-gray-500 bg-white outline-none focus:placeholder-transparent'
                 type='text'
@@ -105,7 +105,7 @@ const AvailableFood = () => {
             Reset
           </button>
         </div>
-        <div className='grid grid-cols-1 gap-8 mt-8 xl:mt-16 md:grid-cols-2 p-10 lg:grid-cols-3 xl:grid-cols-4'>
+        <div className='grid grid-cols-1 gap-2 mt-4 xl:mt-8 md:grid-cols-2 p-1 lg:grid-cols-3 xl:grid-cols-4'>
           {foods.map(food => (
             <FoodCard key={food._id} food={food} />
           ))}
@@ -113,7 +113,7 @@ const AvailableFood = () => {
       </div>
 
       {/* Pagination Section */}
-      <div className='flex justify-center mt-12'>
+      <div className='flex justify-center p-7'>
         {/* Previous Button */}
         <button
           disabled={currentPage === 1}

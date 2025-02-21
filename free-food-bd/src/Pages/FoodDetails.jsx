@@ -54,16 +54,18 @@ const FoodDetails = () => {
   if (isError) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="card items-center justify-center lg:card-side bg-gray-300 max-w-fit m-5 text-black h-max shadow-xl p-5">
+    <div className="items-center flex justify-center">
+      <div className="card  lg:card-side bg-gray-300 max-w-fit m-5 text-black h-max shadow-xl p-5">
       <figure>
         <img src={food?.foodImage} alt={food?.foodName} className="w-full h-60 object-cover" />
       </figure>
       <div className="card-body">
         <h2 className="card-title">{food?.foodName}</h2>
         <p><strong>Donated by:</strong> {food?.donar?.name || 'Unknown'}</p>
-        <p>Donator email:{food?.donar?.email}</p>
+        <p className='text-xs'>Donator email:{food?.donar?.email}</p>
         <p><strong>Quantity:</strong> Serves {food?.foodQuantity} people</p>
-        <p><strong>Expires:</strong> {new Date(food?.expiredDateTime).toLocaleDateString()}</p>
+        <p><strong className='text-red-500'>Expires:</strong> {new Date(food?.expiredDateTime).toLocaleDateString()}</p>
+        <p className='text-xs'>Additional Note: {food?.additionalNotes}</p>
 
         {/* Button to open modal */}
         <button className="btn btn-primary" onClick={() => document.getElementById('my_modal_3').showModal()}>
@@ -127,6 +129,8 @@ const FoodDetails = () => {
         </dialog>
       </div>
     </div>
+    </div>
+    
   );
 };
 
