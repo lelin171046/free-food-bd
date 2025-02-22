@@ -42,6 +42,16 @@ const Navbar = () => {
               Available Foods
             </NavLink>
             <NavLink
+              to="/add-food"
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-lg ${
+                  isActive ? "bg-purple-600 text-white" : "text-gray-700 hover:text-purple-600"
+                }`
+              }
+            >
+              Add Foods
+            </NavLink>
+            <NavLink
               to="/contact"
               className={({ isActive }) =>
                 `px-4 py-2 rounded-lg ${

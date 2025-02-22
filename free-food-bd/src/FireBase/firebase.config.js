@@ -5,12 +5,12 @@ import { initializeApp } from "firebase/app";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyBhUttdcKvqhdGY9r5KMSblSl-g3o_Bwh4",
-  authDomain: "free-food-bd.firebaseapp.com",
-  projectId: "free-food-bd",
-  storageBucket: "free-food-bd.firebasestorage.app",
-  messagingSenderId: "949770972054",
-  appId: "1:949770972054:web:e537a166b7f81c07490bb7"
+  apiKey: import.meta.env.VITE_API_KEY,
+  authDomain: import.meta.env.VITE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_APP_ID
 };
 
 // Initialize Firebase

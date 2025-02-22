@@ -14,6 +14,7 @@ import UpdateFood from "../Component/UpdateFood";
 import FoodDetails from "../Pages/FoodDetails";
 import Contact from "../Pages/Contact";
 import Profile from "../Pages/Profile";
+import PrivateRoute from "./PrivateRoute";
 
 const router = createBrowserRouter([
     {
@@ -27,7 +28,7 @@ const router = createBrowserRouter([
             },
             {
                 path: '/add-food',
-                element: <AddFood></AddFood>
+                element: <PrivateRoute><AddFood></AddFood></PrivateRoute>
             },
             {
                 path: '/available-food',

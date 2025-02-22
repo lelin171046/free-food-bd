@@ -22,7 +22,7 @@ const port = process.env.PORT || 3003;
 const corsOption = {
   origin: [
     'http://localhost:5173',
-    'https://builder-bd.web.app',
+    'https://free-food-bd.web.app',
   ],
   methods: 'GET,POST,PUT,DELETE',
   credentials: true,
@@ -55,7 +55,7 @@ const verifyToken = (req, res, next) => {
 }
 
 // const uri = `mongodb://localhost:27017/`;
-const uri = `mongodb+srv://free_food_bd:UmSDOWO0sx31EFFi@cluster0.0f5vnoo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const uri = `mongodb+srv://${process.env.DB_ID}:${process.env.DB_PASS}@cluster0.0f5vnoo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 // Create a MongoClient
 const client = new MongoClient(uri, {
